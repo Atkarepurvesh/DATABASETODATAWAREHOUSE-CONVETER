@@ -1,0 +1,256 @@
+import mysql.connector
+import snowflake.connector
+import pandas as pd
+import ipywidgets as widgets
+from IPython.display import display
+
+# Widget for MySQL Connection
+mysql_host = widgets.Text(value='localhost', description='MySQL Host:')
+mysql_user = widgets.Text(description='Username:')
+mysql_password = widgets.Password(description='Password:')
+mysql_database = widgets.Text(description='Database:')
+
+mysql_connect_btn = widgets.Button(description='Connect to MySQL')
+output_mysql = widgets.Output()
+
+def connect_mysql(_):
+    global mysql_conn
+    try:
+        mysql_conn = mysql.connector.connect(
+            host=mysql_host.value,
+            user=mysql_user.value,
+            password=mysql_password.value,
+            database=mysql_database.value
+        )
+        with output_mysql:
+            output_mysql.clear_output()
+            print("Connected to MySQL!")
+    except mysql.connector.Error as e:
+        with output_mysql:
+            output_mysql.clear_output()
+            print(f"MySQL Error: {e}")
+
+mysql_connect_btn.on_click(connect_mysql)
+
+display(mysql_host, mysql_user, mysql_password, mysql_database, mysql_connect_btn, output_mysql)
+
+# Widget for Fetching MySQL Data
+fetch_btn = widgets.Button(description='Fetch Data')
+output_fetch = widgets.Output()
+
+def fetch_mysql_data(_):
+    global df
+    try:
+        cursor = mysql_conn.cursor()
+        cursor.execute("SELECT * FROM ")
+        rows = cursor.fetchall()
+        columns = [desc[0] for desc in cursor.description]
+        df = pd.DataFrame(rows, columns=columns)
+        with output_fetch:
+            output_fetch.clear_output()
+            print("Data fetched successfully!")
+            display(df)
+    except Exception as e:
+        with output_fetch:
+            output_fetch.clear_output()
+            print(f"Error fetching data: {e}")
+
+fetch_btn.on_click(fetch_mysql_data)
+
+display(fetch_btn, output_fetch)
+
+# Widget for Snowflake Connection
+snowflake_account = widgets.Text(description='Account:')
+snowflake_user = widgets.Text(description='Username:')
+snowflake_password = widgets.Password(description='Password:')
+snowflake_warehouse = widgets.Text(description='Warehouse:')
+snowflake_database = widgets.Text(description='Database:')
+snowflake_schema = widgets.Text(value='PUBLIC', description='Schema:')
+
+snowflake_connect_btn = widgets.Button(description='Connect to Snowflake')
+output_snowflake = widgets.Output()
+
+def connect_snowflake(_):
+    global snowflake_conn
+    try:
+        snowflake_conn = snowflake.connector.connect(
+            account=snowflake_account.value,
+            user=snowflake_user.value,
+            password=snowflake_password.value,
+            warehouse=snowflake_warehouse.value,
+            database=snowflake_database.value,
+            schema=snowflake_schema.value
+        )
+        with output_snowflake:
+            output_snowflake.clear_output()
+            print("Connected to Snowflake!")
+    except snowflake.connector.errors.Error as e:
+        with output_snowflake:
+            output_snowflake.clear_output()
+            print(f"Snowflake Error: {e}")
+
+snowflake_connect_btn.on_click(connect_snowflake)
+
+display(snowflake_account, snowflake_user, snowflake_password, 
+        snowflake_warehouse, snowflake_database, snowflake_schema, 
+        snowflake_connect_btn, output_snowflake)
+
+# Widget for Data Transfer to Snowflake
+transfer_btn = widgets.Button(description='Transfer Data')
+output_transfer = widgets.Output()
+
+def transfer_to_snowflake(_):
+    try:
+        cursor = snowflake_conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS employees (
+                emp_id INTEGER,
+                name STRING,
+                department STRING,
+                salary FLOAT
+            );
+        """)
+        for _, row in df.iterrows():
+            insert_query = f"INSERT INTO employees VALUES {tuple(row)};"
+            cursor.execute(insert_query)
+        with output_transfer:
+            output_transfer.clear_output()
+            print("Data transferred successfully!")
+    except Exception as e:
+        with output_transfer:
+            output_transfer.clear_output()
+            print(f" Transfer Error: {e}")
+
+transfer_btn.on_click(transfer_to_snowflake)
+
+display(transfer_btn, output_transfer)
+import mysql.connector
+import snowflake.connector
+import pandas as pd
+import ipywidgets as widgets
+from IPython.display import display
+
+# Widget for Snowflake Connection
+snowflake_account = widgets.Text(description='Account:')
+snowflake_user = widgets.Text(description='Username:')
+snowflake_password = widgets.Password(description='Password:')
+snowflake_warehouse = widgets.Text(description='Warehouse:')
+snowflake_database = widgets.Text(description='Database:')
+snowflake_schema = widgets.Text(value='PUBLIC', description='Schema:')
+
+snowflake_connect_btn = widgets.Button(description='Connect to Snowflake')
+output_snowflake = widgets.Output()
+
+def connect_snowflake(_):
+    global snowflake_conn
+    try:
+        snowflake_conn = snowflake.connector.connect(
+            account=snowflake_account.value,
+            user=snowflake_user.value,
+            password=snowflake_password.value,
+            warehouse=snowflake_warehouse.value,
+            database=snowflake_database.value,
+            schema=snowflake_schema.value
+        )
+        with output_snowflake:
+            output_snowflake.clear_output()
+            print("Connected to Snowflake!")
+    except snowflake.connector.errors.Error as e:
+        with output_snowflake:
+            output_snowflake.clear_output()
+            print(f"Snowflake Error: {e}")
+
+snowflake_connect_btn.on_click(connect_snowflake)
+
+display(snowflake_account, snowflake_user, snowflake_password,
+        snowflake_warehouse, snowflake_database, snowflake_schema,
+        snowflake_connect_btn, output_snowflake)
+
+# Widget for Fetching Snowflake Data
+fetch_snowflake_btn = widgets.Button(description='Fetch Snowflake Data')
+output_fetch_snowflake = widgets.Output()
+
+def fetch_snowflake_data(_):
+    global df_snowflake
+    try:
+        cursor = snowflake_conn.cursor()
+        cursor.execute("SELECT * FROM ") # Add table name here.
+        rows = cursor.fetchall()
+        columns = [desc[0] for desc in cursor.description]
+        df_snowflake = pd.DataFrame(rows, columns=columns)
+        with output_fetch_snowflake:
+            output_fetch_snowflake.clear_output()
+            print(" Snowflake data fetched successfully!")
+            display(df_snowflake)
+    except Exception as e:
+        with output_fetch_snowflake:
+            output_fetch_snowflake.clear_output()
+            print(f" Error fetching Snowflake data: {e}")
+
+fetch_snowflake_btn.on_click(fetch_snowflake_data)
+
+display(fetch_snowflake_btn, output_fetch_snowflake)
+
+# Widget for MySQL Connection
+mysql_host = widgets.Text(value='localhost', description='MySQL Host:')
+mysql_user = widgets.Text(description='Username:')
+mysql_password = widgets.Password(description='Password:')
+mysql_database = widgets.Text(description='Database:')
+
+mysql_connect_btn = widgets.Button(description='Connect to MySQL')
+output_mysql = widgets.Output()
+
+def connect_mysql(_):
+    global mysql_conn
+    try:
+        mysql_conn = mysql.connector.connect(
+            host=mysql_host.value,
+            user=mysql_user.value,
+            password=mysql_password.value,
+            database=mysql_database.value
+        )
+        with output_mysql:
+            output_mysql.clear_output()
+            print(" Connected to MySQL!")
+    except mysql.connector.Error as e:
+        with output_mysql:
+            output_mysql.clear_output()
+            print(f" MySQL Error: {e}")
+
+mysql_connect_btn.on_click(connect_mysql)
+
+display(mysql_host, mysql_user, mysql_password, mysql_database, mysql_connect_btn, output_mysql)
+
+# Widget for Data Transfer to MySQL
+transfer_mysql_btn = widgets.Button(description='Transfer to MySQL')
+output_transfer_mysql = widgets.Output()
+
+def transfer_to_mysql(_):
+    try:
+        cursor = mysql_conn.cursor()
+        # Assuming df_snowflake is your DataFrame from Snowflake
+        columns = ", ".join(df_snowflake.columns)
+        placeholders = ", ".join(["%s"] * len(df_snowflake.columns))
+        create_table_query = f"""
+        CREATE TABLE IF NOT EXISTS snowflake_data (
+            {columns}
+        );
+        """
+        cursor.execute(create_table_query)
+
+        for _, row in df_snowflake.iterrows():
+            insert_query = f"INSERT INTO snowflake_data ({columns}) VALUES ({placeholders});"
+            cursor.execute(insert_query, tuple(row))
+        mysql_conn.commit()
+
+        with output_transfer_mysql:
+            output_transfer_mysql.clear_output()
+            print(" Data transferred to MySQL successfully!")
+    except Exception as e:
+        with output_transfer_mysql:
+            output_transfer_mysql.clear_output()
+            print(f" Transfer Error to MySQL: {e}")
+
+transfer_mysql_btn.on_click(transfer_to_mysql)
+
+display(transfer_mysql_btn, output_transfer_mysql)
