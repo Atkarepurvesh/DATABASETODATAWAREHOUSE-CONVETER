@@ -1,0 +1,46 @@
+# MySQL-Snowflake Data Transfer Tool
+
+This interactive tool enables seamless data transfer between **MySQL** and **Snowflake** using Python and `ipywidgets` for a user-friendly interface. It allows users to:
+
+✅ Connect to **MySQL** and **Snowflake** dynamically via interactive widgets  
+✅ Fetch data from **MySQL** and **Snowflake**  
+✅ Transfer data from **MySQL to Snowflake** and **Snowflake to MySQL**  
+✅ Create necessary tables automatically if they don't exist  
+
+## Features
+
+### **MySQL Integration**
+- Connect to a MySQL database, fetch data, and transfer it to Snowflake.
+
+### **Snowflake Integration**
+- Establish a Snowflake connection, retrieve data, and move it to MySQL.
+
+### **Interactive UI**
+- Built using `ipywidgets` for an intuitive, non-code-heavy experience.
+
+### **Automatic Table Handling**
+- Ensures required tables exist in the target system before inserting data.
+
+## Requirements
+
+Install dependencies before running the script:
+
+```bash
+pip install mysql-connector-python snowflake-connector-python pandas ipywidgets
+```
+
+## How to Use
+
+1. Run the script in a Jupyter Notebook.
+2. Enter **MySQL** and **Snowflake** credentials using the provided widgets.
+3. Click **"Connect"** to establish database connections.
+4. Use **"Fetch Data"** buttons to retrieve data from the selected database.
+5. Click **"Transfer Data"** to move data between **MySQL** and **Snowflake**.
+
+## Future Enhancements
+
+- Add **error handling** improvements.
+- Support for **custom table selection**.
+- Provide **data transformation** options before transfer.
+
+This tool simplifies database interactions, making data transfers efficie
